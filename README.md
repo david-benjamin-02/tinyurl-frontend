@@ -1,6 +1,6 @@
 ````md
 
-# Link Dashboard – Frontend
+# TinyURL – Frontend
 
 A modern dashboard built with Next.js for creating, managing, and tracking shortened URLs.
 

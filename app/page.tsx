@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Clipboard, Trash2, Zap, ArrowLeft } from "lucide-react";
 import { fetchLinks, createLink, deleteLink, fetchLinkStats } from "@/lib/api";
 
@@ -22,9 +22,7 @@ const formatTime = (dateString: string | null | undefined) => {
   }
 };
 
-
 const App = () => {
-  
   const [items, setItems] = useState<LinkItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [formLoading, setFormLoading] = useState<boolean>(false);
@@ -58,8 +56,8 @@ const App = () => {
 
   useEffect(() => {
     loadLinks();
-    const intervalId = setInterval(loadLinks, 10000);
-    return () => clearInterval(intervalId);
+    // const intervalId = setInterval(loadLinks, 10000); // Auto-refresh every 10s (commented out)
+    // return () => clearInterval(intervalId);
   }, [loadLinks]);
 
   const addItem = async () => {
@@ -73,9 +71,7 @@ const App = () => {
 
     setFormLoading(true);
     try {
-      const payload: { target: string; code?: string } = {
-        target,
-      };
+      const payload: { target: string; code?: string } = { target };
       if (code.trim()) payload.code = code.trim();
 
       const saved: LinkItem = await createLink(payload);
@@ -93,7 +89,9 @@ const App = () => {
       } else if (err?.status === 400) {
         setError(err.message || "Invalid URL or code format.");
       } else {
-        setError(err?.message || "An unexpected error occurred while creating the link.");
+        setError(
+          err?.message || "An unexpected error occurred while creating the link."
+        );
       }
     } finally {
       setFormLoading(false);
@@ -105,7 +103,7 @@ const App = () => {
       return;
     try {
       await deleteLink(shortCode);
-      setItems((prev) => prev.filter((i) => i.id !== id));
+      window.location.reload(); // Refresh page after delete
     } catch (e) {
       console.error("Delete failed:", e);
       alert("Delete failed. Link may not exist.");
@@ -119,6 +117,10 @@ const App = () => {
     setTimeout(() => setIsCopied(false), 2000);
   };
 
+  const visitLink = (shortCode: string) => {
+    window.open(`/${shortCode}`, "_blank");
+    setTimeout(() => window.location.reload(), 500); // Refresh page after visit
+  };
 
   const closeModal = () => {
     setShowModal(false);
@@ -142,6 +144,7 @@ const App = () => {
       setStatsLoading(false);
     }
   };
+
   const navigateToDashboard = () => {
     setStatsCode(null);
     setCurrentView("dashboard");
@@ -213,7 +216,6 @@ const App = () => {
                     colSpan={5}
                     className="text-center py-12 text-indigo-500 flex items-center justify-center gap-2"
                   >
-                    <Zap className="animate-pulse h-5 w-5" />
                     Loading links...
                   </td>
                 </tr>
@@ -263,27 +265,23 @@ const App = () => {
 
                     <td className="py-3 px-4 flex justify-center gap-2">
                       <button
-                        onClick={(e) => { e.stopPropagation(), copyShortLink(item.shortCode) }}
+                        onClick={(e) => { e.stopPropagation(); copyShortLink(item.shortCode); }}
                         className="p-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-600 transition"
                         title="Copy Short Link"
                       >
                         <Clipboard className="h-4 w-4" />
                       </button>
-                      <a
-                        onClick={(e) => e.stopPropagation()}
-                        href={`/${item.shortCode}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition cursor-pointer"
-                        title="Visit Link"
-
-                      >
-                        <Zap className="h-4 w-4" />
-                      </a>
-
 
                       <button
-                        onClick={(e) => { e.stopPropagation(), removeItem(item.id, item.shortCode) }}
+                        onClick={(e) => { e.stopPropagation(); visitLink(item.shortCode); }}
+                        className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition cursor-pointer"
+                        title="Visit Link"
+                      >
+                        <Zap className="h-4 w-4" />
+                      </button>
+
+                      <button
+                        onClick={(e) => { e.stopPropagation(); removeItem(item.id, item.shortCode); }}
                         className="p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
                         title="Delete Link"
                       >
@@ -298,6 +296,7 @@ const App = () => {
       </div>
     </>
   );
+
   const StatsView = () => {
     if (statsLoading) {
       return (
@@ -390,8 +389,6 @@ const App = () => {
       </div>
     );
   };
-
-
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 font-sans">
