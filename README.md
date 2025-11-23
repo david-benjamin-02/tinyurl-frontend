@@ -1,50 +1,53 @@
-```md
+````md
 
 # Link Dashboard – Frontend
 
 A modern dashboard built with Next.js for creating, managing, and tracking shortened URLs.
-This frontend communicates with a backend service (Node.js/Express) that handles redirecting and analytics.
+
+This frontend communicates with a backend service responsible for redirecting short links and storing analytics.
 
 ---
 
 ## Features
 
-* Create short links from long URLs
-* Copy short links to clipboard
-* View stats: total clicks, creation date, last clicked
-* Visit and delete links
-* Row-click opens stats modal
-* Visit button opens actual redirect URL
-* Backend redirect support through Next.js Proxy
+- Create short links from long URLs  
+- Copy short links to clipboard  
+- View analytics: total clicks, creation date, last clicked  
+- Visit and delete links  
+- Row-click opens stats view  
+- Visit button opens the backend redirect URL  
+- Built-in proxy to support frontend-based redirects
 
 ---
 
 ## Tech Stack
 
-* Next.js 16 (App Router)
-* TypeScript
-* TailwindCSS
-* Lucide Icons
-* REST API (Backend running on Express/Nest/Fastify etc.)
+- Next.js 16 (App Router)
+- TypeScript
+- TailwindCSS
+- Lucide Icons
+- REST API backend (Express/Nest/Fastify, etc.)
 
 ---
 
 ## Environment Variables
 
-Create a `.env` file:
+Create a `.env` file in the project root:
 
 ```
 NEXT_PUBLIC_API_URL=http://localhost:4000
 ```
 
-Meaning:
+Explanation:
 
-* The backend runs at port 4000.
-* All API calls and short-link visits use this backend URL.
+- Backend runs at port `4000`.
+- All API calls and redirect operations use this backend URL.
 
 ---
 
-## Install Dependencies
+## Installation
+
+Install dependencies:
 
 ```
 npm install
@@ -52,7 +55,7 @@ npm install
 
 ---
 
-## Development Server
+## Running in Development
 
 Start the development server:
 
@@ -60,7 +63,7 @@ Start the development server:
 npm run dev
 ```
 
-It will run at:
+Application will be available at:
 
 ```
 http://localhost:3000
@@ -69,6 +72,8 @@ http://localhost:3000
 ---
 
 ## Production Build
+
+Build and start:
 
 ```
 npm run build
@@ -85,7 +90,8 @@ frontend/
  │   ├─ page.tsx
  │   ├─ layout.tsx
  ├─ components/
- ├─ lib/api.ts
+ ├─ lib/
+ │   └─ api.ts
  ├─ public/
  ├─ proxy.ts
  ├─ styles/
@@ -95,49 +101,60 @@ frontend/
 
 ---
 
-## Proxy Redirect
+## Proxy Redirect (Next.js 16)
 
-Next.js 16 no longer uses `middleware.ts` for redirects.
+Next.js 16 replaces `middleware.ts` with `proxy.ts`.
 
-Instead, use the new Proxy
+With proxy enabled, this works:
 
 ```
 http://localhost:3000/abc123
 ```
 
-Internally proxies to:
+The request is internally forwarded to:
 
 ```
 http://localhost:4000/abc123
 ```
 
-If backend returns redirect (302), browser will follow it.
+If the backend returns a redirect (`302`), the browser will follow it.
 
 ---
 
 ## Copy and Visit Behavior
 
-Copy button copies frontend URL:
+### Copy Button  
+Copies the full frontend URL:
 
 ```
-http://localhost:3000/shortCode
+http://localhost:3000/<shortCode>
 ```
 
-Visit button opens frontend URL and rediredt to backend URL:
+### Visit Button  
+Opens backend redirect URL:
 
 ```
-href={`${NEXT_PUBLIC_API_URL}/${item.shortCode}`}
+http://localhost:4000/<shortCode>
 ```
 
-Row click opens stats drawer.
+### Row Click  
+Opens the stats panel for the selected short link.
 
 ---
 
-## API Endpoints Used
+## API Endpoints Used by the Frontend
 
 ```
 GET    /api/links
 GET    /api/links/:id
 POST   /api/links
 DELETE /api/links/:id
+```
+
+---
+
+## License
+
+This project is for personal or educational use. You may modify it as needed.
+
 ```

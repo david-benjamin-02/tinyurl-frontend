@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* You can keep your custom utilities */
+:root{
+  --muted: #6b7280;
+}
+
+.text-muted-foreground {
+  color: var(--muted);
+}
+
+html, body, #root {
+  height: 100%;
+}
