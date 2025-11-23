@@ -446,7 +446,7 @@ const App = () => {
                 placeholder="Short code (e.g., mylink)"
                 value={code}
                 onChange={(e) => {
-                  const cleanValue = e.target.value.replace(/[^a-zA-Z0-9-]/g, "").toLowerCase();
+                  const cleanValue = e.target.value.replace(/[^a-zA-Z0-9]/g, "").toLowerCase();
                   setCode(cleanValue);
                   setError(null);
                 }}
